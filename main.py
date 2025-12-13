@@ -44,9 +44,45 @@ def plane_equation(v1, v2, v3):
 
     return A, B, C, D
 
+def evaluate(coeffs, point):
+    """
+    получает уравнение плоскости
+    """
+    A, B, C, D = coeffs
+    x, y, z = point
+    return round(A * x + B * y + C * z + D, 8)
+
+
 def main():
     for name, v1, v2, v3, opposite in FACES:
-        a, b, c, d = plane_equation(v1, v2, v3)
-        # TODO сделать проверку на отрицательное число в уравнении для инвертирования
-        # TODO сделать сравнение знаков
-main()
+        coeffs = plane_equation(v1, v2, v3)
+        A, B, C, D = coeffs
+        val = evaluate(coeffs, opposite)
+        res = []
+
+        # инвертирование
+        if val < 0:
+            A, B, C, D = [-c for c in coeffs]
+            val *= -1
+            
+        # подстановка точки P
+        val_p = evaluate((A, B, C, D), P)
+        
+        # сравнение знаков 
+        if val_p < 0:
+            return "точка вне тетраэдра"
+        # точка на границе
+        elif val_p == 0:
+            res.append(name)
+    
+    if len(res) == 1:
+        return f"точка P лежит на грани: {res[0]}"
+    elif len(res) == 2:
+        return f"точка P лежит на ребре, образованном гранями: {res[0]} и {res[1]}"
+    elif len(res) >= 3:
+        return f"точка P лежит на вершине"
+    
+    return "точка P находится внутри тетраэдра."
+
+res = main()
+print(res)
